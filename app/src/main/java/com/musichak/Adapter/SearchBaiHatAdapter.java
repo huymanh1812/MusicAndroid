@@ -41,7 +41,7 @@ public class SearchBaiHatAdapter extends RecyclerView.Adapter<SearchBaiHatAdapte
         BaiHat baiHat = listbaihat.get(position);
         holder.txtcasi.setText(baiHat.getCaSi());
         holder.txttenbaihat.setText(baiHat.getTenBaiHat());
-        Picasso.with(context).load(baiHat.getLinkBaiHat()).into(holder.imgbaihat);
+        Picasso.with(context).load(baiHat.getHinhBaiHat()).into(holder.imgbaihat);
     }
 
     @Override

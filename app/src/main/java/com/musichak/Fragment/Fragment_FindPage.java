@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.appcompat.widget.SearchView;
+
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,10 +18,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.musichak.Adapter.SearchBaiHatAdapter;
+import com.musichak.Model.BaiHat;
 import com.musichak.R;
+import com.musichak.Service.APIService;
+import com.musichak.Service.DataService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Fragment_FindPage extends Fragment {
 
@@ -50,7 +63,7 @@ public class Fragment_FindPage extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.d("BBB",query);
+                SearchTuKhoaBaiHat(query);
                 return true;
             }
 
@@ -60,5 +73,31 @@ public class Fragment_FindPage extends Fragment {
             }
         });
         super.onCreateOptionsMenu(menu, inflater);
+    }
+    private void SearchTuKhoaBaiHat(String query){
+        DataService dataService = APIService.getService();
+        Call<List<BaiHat>> callback = dataService.GetSearchBaiHat(query);
+        callback.enqueue(new Callback<List<BaiHat>>() {
+            @Override
+            public void onResponse(Call<List<BaiHat>> call, Response<List<BaiHat>> response) {
+                ArrayList<BaiHat> listBaiHat = (ArrayList<BaiHat>) response.body();
+                if (listBaiHat.size()>0){
+                    searchBaiHatAdapter = new SearchBaiHatAdapter(getActivity(),listBaiHat);
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                    recyclerViewSearchBaiHat.setLayoutManager(linearLayoutManager);
+                    recyclerViewSearchBaiHat.setAdapter(searchBaiHatAdapter);
+                    txtNoData.setVisibility(View.GONE);
+                    recyclerViewSearchBaiHat.setVisibility(View.VISIBLE);
+                }else {
+                    recyclerViewSearchBaiHat.setVisibility(View.GONE);
+                    txtNoData.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<BaiHat>> call, Throwable t) {
+
+            }
+        });
     }
 }
